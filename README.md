@@ -1,12 +1,12 @@
 # auto-impl-brief
 
-`auto-impl-brief` is a reusable Codex skill and portable prompt for evidence-driven software implementation. It can prepare a self-contained assignment for a clean Codex session or apply the same engineering contract directly in a target repository.
+`auto-impl-brief` is a controlled implementation orchestration framework for Codex. It turns objectives and constraints into verified implementation briefs or autonomous implementation runs.
 
-## Choose a workflow
+## Modes
 
-- **Brief mode** creates a standalone assignment you can inspect, edit, and hand to another Codex session.
-- **Execute mode** applies the workflow in the current session and continues through implementation and verification.
-- **Portable template** lets you use [`templates/implementation-brief.md`](templates/implementation-brief.md) without installing the skill.
+- **Brief mode** compiles the supplied objective, constraints, and acceptance criteria into a complete implementation brief.
+- **Execute mode** runs the implementation protocol in the current repository and continues through verification.
+- **Implementation protocol** defines the shared engineering loop, dependency graph, delegation rules, verification gates, and authority boundaries in [`protocol/implementation-brief.md`](protocol/implementation-brief.md).
 
 ## Install as a personal Codex skill
 
@@ -20,7 +20,7 @@ If you already have a clone, you may link that repository into the same skills d
 
 ## Use
 
-Generate a handoff for a clean Codex session:
+Compile an implementation brief:
 
 ```text
 $auto-impl-brief mode: brief
@@ -47,7 +47,7 @@ GIT_AND_PUBLISH_POLICY:
 Local commits are allowed. Do not push or create a pull request.
 ```
 
-If `mode` is omitted, the skill infers `brief` for requests to prepare an assignment and `execute` for requests to perform a formal implementation workflow. It asks one concise question only when the intent remains ambiguous.
+If `mode` is omitted, the skill infers `brief` for requests to prepare an implementation brief and `execute` for requests to perform a formal implementation workflow. It asks one concise question only when the intent remains ambiguous.
 
 ## Inputs
 
@@ -89,7 +89,7 @@ Maintainers should also run the official Codex skill validator from the installe
 
 ## Contributing
 
-Keep the reusable files project-neutral. Add a failing validation or reproducible scenario before changing behaviour, make the smallest implementation change, and run every validation scope before opening a pull request.
+Keep the framework project-neutral and use the current product terminology. Add a failing validation or reproducible scenario before changing behaviour, make the smallest implementation change, and run `sh tests/validate.sh all` before opening a pull request.
 
 ## License
 

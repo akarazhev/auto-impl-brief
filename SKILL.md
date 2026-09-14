@@ -1,20 +1,20 @@
 ---
 name: auto-impl-brief
-description: Generate a self-contained implementation assignment for a clean Codex session, or execute a complex repository task autonomously using an evidence-driven engineering loop, dependency graph, bounded subagents, and explicit safety constraints. Use when a user asks for a reusable implementation handoff or a formal autonomous implementation workflow. Do not use for ordinary coding requests that do not need this structured contract.
+description: Use when a user wants Codex to prepare or run a structured implementation workflow for a complex repository task.
 ---
 
 # Auto Implementation Brief
 
-Turn a goal into a complete execution contract or apply that contract directly. Remain project-neutral and preserve user authority over remote and destructive actions.
+`auto-impl-brief` is a controlled implementation orchestration framework for Codex. It compiles an implementation brief or performs an implementation run while preserving user authority over destructive and remote actions.
 
 ## Mode selection
 
 Use an explicit mode when supplied:
 
-- `mode: brief` produces one self-contained prompt for a clean Codex session.
-- `mode: execute` performs the work in the current session.
+- `mode: brief` compiles a complete implementation brief for a Codex session.
+- `mode: execute` performs an implementation run in the current session.
 
-Without an explicit mode, infer `brief` from requests to prepare, write, or generate an assignment. Infer `execute` from requests to implement, fix, build, or complete work using this formal workflow. If both remain plausible, ask one concise question and do not alter files before the answer.
+Without an explicit mode, infer `brief` from requests to prepare, write, or generate an implementation brief. Infer `execute` from requests to implement, fix, build, or complete work using this formal workflow. If both remain plausible, ask one concise question and do not alter files before the answer.
 
 ## Normalize the request
 
@@ -34,11 +34,11 @@ Only `OBJECTIVE` is universally required. Derive repository facts when already i
 
 ## Brief mode
 
-Read `templates/implementation-brief.md` completely. Replace every template field with supplied facts, derived repository facts, an explicit safe default, or `Not supplied — resolve before the dependent step`. Remove instructional comments and return one copyable prompt.
+Read `protocol/implementation-brief.md` completely. Replace every protocol field with supplied facts, derived repository facts, an explicit safe default, or `Not supplied — resolve before the dependent step`. Remove instructional comments and return one copyable implementation brief.
 
 The generated brief must be self-contained. It must not rely on this skill, prior conversation, or unstated project knowledge. Preserve material user constraints verbatim. Make acceptance criteria observable and distinguish required checks from environment-dependent checks.
 
-Do not execute the generated assignment unless the user separately asks to do so.
+Do not execute the generated implementation brief unless the user separately asks to do so.
 
 ## Execute mode
 
@@ -86,6 +86,6 @@ A genuine blocker requires new authority, credentials, unavailable mandatory ext
 
 ## Output contracts
 
-Brief mode returns only the self-contained assignment, preceded by a one-sentence usage note when helpful.
+Brief mode returns only the self-contained implementation brief, preceded by a one-sentence usage note when helpful.
 
 Execute mode leads with the outcome and reports changed behaviour, important files, exact verification results, acceptance coverage, unavailable checks, residual risks, commits, remote actions, and final Git status. Never claim checks that were not run.

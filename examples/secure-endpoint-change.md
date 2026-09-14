@@ -1,6 +1,6 @@
-# Example: Complete a Bounded Repository Change
+# Example: Secure Endpoint Change
 
-This example shows how to specialize the portable template. The repository and task are fictional.
+This fictional scenario demonstrates `brief` mode for a bounded security change. The repository and task are fictional.
 
 ```text
 mode: brief
@@ -41,4 +41,4 @@ EXTERNAL_INPUTS:
 No credentials are required. Use test doubles for dependency checks. Report any real integration environment as unavailable rather than inventing results.
 ```
 
-Expected brief-mode result: one self-contained assignment based on `templates/implementation-brief.md`, with every field above resolved and no dependency on prior conversation.
+Expected result: an implementation brief that conforms to `protocol/implementation-brief.md`, resolves every supplied field, and requires no unstated context.

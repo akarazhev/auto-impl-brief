@@ -1,8 +1,8 @@
-# Autonomous Implementation Assignment
+# Auto Implementation Protocol
 
 ## Mission
 
-You are responsible for completing this task from inspection through implementation, verification, integration, and final reporting. Do not stop after planning, scaffolding, or partial implementation.
+Run a controlled software implementation from initial inspection through implementation, verification, integration, and final reporting. Do not stop after planning, scaffolding, or partial implementation.
 
 ## Inputs
 
@@ -94,7 +94,7 @@ Stop only when progress requires new authority, credentials, unavailable mandato
 
 ## Completion standard
 
-The assignment is complete only when all supplied acceptance criteria are implemented and backed by fresh evidence, documentation matches behaviour, relevant integrations pass, and no required work remains.
+The implementation run is complete only when all supplied acceptance criteria are implemented and backed by fresh evidence, documentation matches behaviour, relevant integrations pass, and no required work remains.
 
 ## Final report
 
