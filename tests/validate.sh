@@ -94,15 +94,28 @@ validate_docs() {
   reject_literal "examples/complete-project-example.md" "C:\\Users\\"
 }
 
+validate_consistency() {
+  for field in OBJECTIVE REPOSITORY STARTING_POINT SPECIFICATIONS CONSTRAINTS ACCEPTANCE_CRITERIA MODEL_POLICY GIT_AND_PUBLISH_POLICY EXTERNAL_INPUTS; do
+    require_literal "SKILL.md" "$field"
+    require_literal "templates/implementation-brief.md" "{{$field}}"
+  done
+
+  require_literal "SKILL.md" "Do not push"
+  require_literal "templates/implementation-brief.md" "do not push"
+  require_literal "README.md" "no unauthorized remote"
+}
+
 scope=${1:-all}
 case "$scope" in
   skill) validate_skill ;;
   template) validate_template ;;
   docs) validate_docs ;;
+  consistency) validate_consistency ;;
   all)
     validate_skill
     validate_template
     validate_docs
+    validate_consistency
     ;;
   *) fail "unknown scope: $scope" ;;
 esac
