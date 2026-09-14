@@ -30,6 +30,7 @@
 
 - `SKILL.md`: installable skill metadata, mode inference, brief generation, execute workflow, safety defaults, and output contracts.
 - `agents/openai.yaml`: Codex-facing display metadata.
+- `.gitignore`: excludes local IDE and operating-system metadata without deleting user files.
 - `templates/implementation-brief.md`: canonical project-neutral prompt with user-replaceable fields and autonomous execution rules.
 - `tests/validate.sh`: dependency-free structural and semantic validation with `skill`, `template`, `docs`, and `all` scopes.
 - `examples/complete-project-example.md`: fully resolved neutral example with no unresolved template fields.
@@ -44,6 +45,7 @@
 - Create: `tests/validate.sh`
 - Create: `SKILL.md`
 - Create: `agents/openai.yaml`
+- Create: `.gitignore`
 
 **Interfaces:**
 
@@ -90,7 +92,10 @@ reject_literal() {
 validate_skill() {
   require_file "SKILL.md"
   require_file "agents/openai.yaml"
+  require_file ".gitignore"
   require_executable "tests/validate.sh"
+  require_literal ".gitignore" ".idea/"
+  require_literal ".gitignore" ".DS_Store"
   require_literal "SKILL.md" "name: auto-impl-brief"
   require_literal "SKILL.md" "## Mode selection"
   require_literal "SKILL.md" '`mode: brief`'
@@ -159,7 +164,16 @@ sh tests/validate.sh skill
 
 Expected: exit 1 with `FAIL: missing file: SKILL.md`.
 
-- [ ] **Step 3: Add the skill metadata**
+- [ ] **Step 3: Add safe local-file exclusions**
+
+Create `.gitignore` exactly as follows. Do not delete an existing `.idea/` directory; ignore it in Git only.
+
+```gitignore
+.DS_Store
+.idea/
+```
+
+- [ ] **Step 4: Add the skill metadata**
 
 Create `agents/openai.yaml` exactly as follows:
 
@@ -169,7 +183,7 @@ interface:
   short_description: "Generate or execute evidence-driven implementation briefs"
 ```
 
-- [ ] **Step 4: Add the core skill instructions**
+- [ ] **Step 5: Add the core skill instructions**
 
 Create `SKILL.md` with YAML front matter and these required sections and rules:
 
@@ -267,20 +281,20 @@ Brief mode returns only the self-contained assignment, preceded by a one-sentenc
 Execute mode leads with the outcome and reports changed behaviour, important files, exact verification results, acceptance coverage, unavailable checks, residual risks, commits, remote actions, and final Git status. Never claim checks that were not run.
 ```
 
-- [ ] **Step 5: Run the focused validation**
+- [ ] **Step 6: Run the focused validation**
 
 Run: `sh tests/validate.sh skill`
 
 Expected: `PASS: skill`.
 
-- [ ] **Step 6: Inspect and commit Task 1**
+- [ ] **Step 7: Inspect and commit Task 1**
 
 Run:
 
 ```bash
 git diff --check
 git status --short
-git add SKILL.md agents/openai.yaml tests/validate.sh
+git add .gitignore SKILL.md agents/openai.yaml tests/validate.sh
 git diff --cached --check
 git commit -m "feat: add auto implementation skill"
 ```
