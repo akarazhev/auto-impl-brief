@@ -70,6 +70,9 @@ validate_template() {
 
 validate_docs() {
   require_file "README.md"
+  require_literal "README.md" "git clone https://github.com/akarazhev/auto-impl-brief.git"
+  require_literal "README.md" "templates/implementation-brief.md"
+  require_literal "README.md" "Apache-2.0"
   require_file "LICENSE"
   require_file "examples/complete-project-example.md"
 
