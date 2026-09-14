@@ -84,6 +84,9 @@ validate_docs() {
     fail "example contains unresolved template fields"
   fi
 
+  require_literal "examples/complete-project-example.md" "The repository and task are fictional."
+  require_literal "examples/complete-project-example.md" "/workspace/sample-service"
+  require_literal "examples/complete-project-example.md" "Do not push, create a pull request, deploy, or publish"
   reject_literal "examples/complete-project-example.md" "/Users/"
   reject_literal "examples/complete-project-example.md" "C:\\Users\\"
 }
