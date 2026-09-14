@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build and publish a reusable Codex skill with `brief` and `execute` modes, together with a portable Markdown implementation-brief template.
+**Goal:** Build and publish `auto-impl-brief` as a controlled implementation orchestration framework for Codex with `brief` and `execute` modes.
 
-**Architecture:** The repository root is an installable Codex skill. `SKILL.md` defines mode selection and execution behaviour, while `templates/implementation-brief.md` is the canonical portable contract used by brief mode. A dependency-free POSIX shell validator checks package structure and cross-file invariants; documentation and a neutral example make the project usable without the skill.
+**Architecture:** The repository root is an installable Codex execution framework. `SKILL.md` defines mode selection and execution behaviour, while `protocol/implementation-brief.md` is the canonical implementation protocol shared by both modes. A dependency-free POSIX shell validator checks package structure and cross-file invariants; documentation and a neutral example explain the framework as a complete product.
 
 **Tech Stack:** Markdown, YAML, POSIX shell, Git, Codex skills.
 
@@ -12,7 +12,7 @@
 
 - The package name and skill name are exactly `auto-impl-brief`.
 - Support both explicit modes: `brief` and `execute`.
-- Infer `brief` for requests to prepare or generate an assignment and `execute` for requests to implement or complete work; ask one concise question only when the intent remains ambiguous.
+- Infer `brief` for requests to prepare or generate an implementation brief and `execute` for requests to implement or complete work; ask one concise question only when the intent remains ambiguous.
 - Remain independent of every target project, organization, programming language, and repository layout.
 - Treat only `OBJECTIVE` as universally required; derive repository context when already inside the target repository.
 - Read applicable repository instructions and Git status before editing in execute mode.
@@ -31,9 +31,9 @@
 - `SKILL.md`: installable skill metadata, mode inference, brief generation, execute workflow, safety defaults, and output contracts.
 - `agents/openai.yaml`: Codex-facing display metadata.
 - `.gitignore`: excludes local IDE and operating-system metadata without deleting user files.
-- `templates/implementation-brief.md`: canonical project-neutral prompt with user-replaceable fields and autonomous execution rules.
-- `tests/validate.sh`: dependency-free structural and semantic validation with `skill`, `template`, `docs`, and `all` scopes.
-- `examples/complete-project-example.md`: fully resolved neutral example with no unresolved template fields.
+- `protocol/implementation-brief.md`: canonical implementation protocol with public input fields and execution rules.
+- `tests/validate.sh`: dependency-free structural and semantic validation with `skill`, `protocol`, `docs`, `consistency`, and `all` scopes.
+- `examples/secure-endpoint-change.md`: fully resolved neutral example with no unresolved protocol fields.
 - `README.md`: installation, invocation, inputs, safety defaults, validation, and contribution instructions.
 - `LICENSE`: canonical Apache License 2.0 text.
 - `docs/design.md`: approved design; modify only if implementation discovers a genuine contradiction.
@@ -105,46 +105,46 @@ validate_skill() {
   require_literal "SKILL.md" "Do not push"
   require_literal "SKILL.md" "fresh verification evidence"
   require_literal "agents/openai.yaml" 'display_name: "Auto Implementation Brief"'
-  require_literal "agents/openai.yaml" 'short_description: "Generate or execute evidence-driven implementation briefs"'
+  require_literal "agents/openai.yaml" 'short_description: "Plan and run controlled software implementations"'
 }
 
-validate_template() {
-  require_file "templates/implementation-brief.md"
+validate_protocol() {
+  require_file "protocol/implementation-brief.md"
   for field in OBJECTIVE REPOSITORY STARTING_POINT SPECIFICATIONS CONSTRAINTS ACCEPTANCE_CRITERIA MODEL_POLICY GIT_AND_PUBLISH_POLICY EXTERNAL_INPUTS; do
-    require_literal "templates/implementation-brief.md" "{{$field}}"
+    require_literal "protocol/implementation-brief.md" "{{$field}}"
   done
-  require_literal "templates/implementation-brief.md" "Inspect → Define → Test first → Implement"
-  require_literal "templates/implementation-brief.md" "Dependency graph"
-  require_literal "templates/implementation-brief.md" "Final report"
-  reject_literal "templates/implementation-brief.md" "/Users/"
-  reject_literal "templates/implementation-brief.md" "C:\\Users\\"
+  require_literal "protocol/implementation-brief.md" "Inspect → Define → Test first → Implement"
+  require_literal "protocol/implementation-brief.md" "Dependency graph"
+  require_literal "protocol/implementation-brief.md" "Final report"
+  reject_literal "protocol/implementation-brief.md" "/Users/"
+  reject_literal "protocol/implementation-brief.md" "C:\\Users\\"
 }
 
 validate_docs() {
   require_file "README.md"
   require_file "LICENSE"
-  require_file "examples/complete-project-example.md"
+  require_file "examples/secure-endpoint-change.md"
   require_literal "README.md" '$auto-impl-brief'
   require_literal "README.md" "mode: brief"
   require_literal "README.md" "mode: execute"
   require_literal "README.md" "sh tests/validate.sh all"
   require_literal "LICENSE" "Apache License"
   require_literal "LICENSE" "Version 2.0, January 2004"
-  if grep -Eq '\{\{[A-Z_]+\}\}' "$repo_root/examples/complete-project-example.md"; then
-    fail "example contains unresolved template fields"
+  if grep -Eq '\{\{[A-Z_]+\}\}' "$repo_root/examples/secure-endpoint-change.md"; then
+    fail "example contains unresolved protocol fields"
   fi
-  reject_literal "examples/complete-project-example.md" "/Users/"
-  reject_literal "examples/complete-project-example.md" "C:\\Users\\"
+  reject_literal "examples/secure-endpoint-change.md" "/Users/"
+  reject_literal "examples/secure-endpoint-change.md" "C:\\Users\\"
 }
 
 scope=${1:-all}
 case "$scope" in
   skill) validate_skill ;;
-  template) validate_template ;;
+  protocol) validate_protocol ;;
   docs) validate_docs ;;
   all)
     validate_skill
-    validate_template
+    validate_protocol
     validate_docs
     ;;
   *) fail "unknown scope: $scope" ;;
@@ -180,7 +180,7 @@ Create `agents/openai.yaml` exactly as follows:
 ```yaml
 interface:
   display_name: "Auto Implementation Brief"
-  short_description: "Generate or execute evidence-driven implementation briefs"
+  short_description: "Plan and run controlled software implementations"
 ```
 
 - [ ] **Step 5: Add the core skill instructions**
@@ -190,21 +190,21 @@ Create `SKILL.md` with YAML front matter and these required sections and rules:
 ```markdown
 ---
 name: auto-impl-brief
-description: Generate a self-contained implementation assignment for a clean Codex session, or execute a complex repository task autonomously using an evidence-driven engineering loop, dependency graph, bounded subagents, and explicit safety constraints. Use when a user asks for an implementation brief, autonomous implementation, systematic completion of a specification, or reusable execution instructions.
+description: Use when a user wants Codex to prepare or run a structured implementation workflow for a complex repository task.
 ---
 
 # Auto Implementation Brief
 
-Turn a goal into a complete execution contract or apply that contract directly. Remain project-neutral and preserve user authority over remote and destructive actions.
+`auto-impl-brief` is a controlled implementation orchestration framework for Codex. It compiles an implementation brief or performs an implementation run while preserving user authority over destructive and remote actions.
 
 ## Mode selection
 
 Use an explicit mode when supplied:
 
-- `mode: brief` produces one self-contained prompt for a clean Codex session.
-- `mode: execute` performs the work in the current session.
+- `mode: brief` compiles a complete implementation brief for a Codex session.
+- `mode: execute` performs an implementation run in the current session.
 
-Without an explicit mode, infer `brief` from requests to prepare, write, or generate an assignment. Infer `execute` from requests to implement, fix, build, or complete work. If both remain plausible, ask one concise question and do not alter files before the answer.
+Without an explicit mode, infer `brief` from requests to prepare, write, or generate an implementation brief. Infer `execute` from requests to implement, fix, build, or complete work. If both remain plausible, ask one concise question and do not alter files before the answer.
 
 ## Normalize the request
 
@@ -224,11 +224,11 @@ Only `OBJECTIVE` is universally required. Derive repository facts when already i
 
 ## Brief mode
 
-Read `templates/implementation-brief.md` completely. Replace every template field with supplied facts, derived repository facts, an explicit safe default, or `Not supplied — resolve before the dependent step`. Remove instructional comments and return one copyable prompt.
+Read `protocol/implementation-brief.md` completely. Replace every protocol field with supplied facts, derived repository facts, an explicit safe default, or `Not supplied — resolve before the dependent step`. Remove instructional comments and return one copyable implementation brief.
 
 The generated brief must be self-contained. It must not rely on this skill, prior conversation, or unstated project knowledge. Preserve material user constraints verbatim. Make acceptance criteria observable and distinguish required checks from environment-dependent checks.
 
-Do not execute the generated assignment unless the user separately asks to do so.
+Do not execute the generated implementation brief unless the user separately asks to do so.
 
 ## Execute mode
 
@@ -276,7 +276,7 @@ A genuine blocker requires new authority, credentials, unavailable mandatory ext
 
 ## Output contracts
 
-Brief mode returns only the self-contained assignment, preceded by a one-sentence usage note when helpful.
+Brief mode returns only the complete implementation brief, preceded by a one-sentence usage note when helpful.
 
 Execute mode leads with the outcome and reports changed behaviour, important files, exact verification results, acceptance coverage, unavailable checks, residual risks, commits, remote actions, and final Git status. Never claim checks that were not run.
 ```
@@ -301,34 +301,34 @@ git commit -m "feat: add auto implementation skill"
 
 Expected: one commit containing only the skill contract, metadata, and validator.
 
-## Task 2: Portable Implementation-Brief Template
+## Task 2: Implementation Protocol
 
 **Files:**
 
-- Create: `templates/implementation-brief.md`
+- Create: `protocol/implementation-brief.md`
 - Modify: `tests/validate.sh`
 
 **Interfaces:**
 
 - Consumes: normalized fields and brief-mode rules from `SKILL.md`.
-- Produces: a standalone prompt that remains usable without installing the skill.
+- Produces: the canonical implementation protocol used by `brief` mode.
 
-- [ ] **Step 1: Confirm the template scope fails before implementation**
+- [ ] **Step 1: Confirm the protocol scope fails before implementation**
 
-Run: `sh tests/validate.sh template`
+Run: `sh tests/validate.sh protocol`
 
-Expected: exit 1 with `FAIL: missing file: templates/implementation-brief.md`.
+Expected: exit 1 with `FAIL: missing file: protocol/implementation-brief.md`.
 
-- [ ] **Step 2: Add the canonical template**
+- [ ] **Step 2: Add the canonical protocol**
 
-Create `templates/implementation-brief.md`. It must contain the following exact structure and rules; retain the double-braced fields because they are the public template interface:
+Create `protocol/implementation-brief.md`. It must contain the following exact structure and rules; retain the double-braced fields because they are the public protocol interface:
 
 ```markdown
-# Autonomous Implementation Assignment
+# Auto Implementation Protocol
 
 ## Mission
 
-You are responsible for completing this task from inspection through implementation, verification, integration, and final reporting. Do not stop after planning, scaffolding, or partial implementation.
+Run a controlled software implementation from initial inspection through implementation, verification, integration, and final reporting. Do not stop after planning, scaffolding, or partial implementation.
 
 ## Inputs
 
@@ -420,7 +420,7 @@ Stop only when progress requires new authority, credentials, unavailable mandato
 
 ## Completion standard
 
-The assignment is complete only when all supplied acceptance criteria are implemented and backed by fresh evidence, documentation matches behaviour, relevant integrations pass, and no required work remains.
+The implementation run is complete only when all supplied acceptance criteria are implemented and backed by fresh evidence, documentation matches behaviour, relevant integrations pass, and no required work remains.
 
 ## Final report
 
@@ -438,22 +438,22 @@ Lead with the outcome and include:
 10. confirmation that unrelated work and private inputs were preserved.
 ```
 
-- [ ] **Step 3: Tighten the validator for accidental template drift**
+- [ ] **Step 3: Tighten the validator for accidental protocol drift**
 
-In `validate_template()`, after the existing final-report assertion, add:
+In `validate_protocol()`, after the existing final-report assertion, add:
 
 ```sh
-  require_literal "templates/implementation-brief.md" "Do not stop after planning, scaffolding, or partial implementation."
-  require_literal "templates/implementation-brief.md" "at most three implementation subagents concurrently"
-  require_literal "templates/implementation-brief.md" "Without explicit authorization, do not push"
-  require_literal "templates/implementation-brief.md" "map evidence to every acceptance criterion"
+  require_literal "protocol/implementation-brief.md" "Do not stop after planning, scaffolding, or partial implementation."
+  require_literal "protocol/implementation-brief.md" "at most three implementation subagents concurrently"
+  require_literal "protocol/implementation-brief.md" "Without explicit authorization, do not push"
+  require_literal "protocol/implementation-brief.md" "map evidence to every acceptance criterion"
 ```
 
 - [ ] **Step 4: Run the focused validation**
 
-Run: `sh tests/validate.sh template`
+Run: `sh tests/validate.sh protocol`
 
-Expected: `PASS: template`.
+Expected: `PASS: protocol`.
 
 - [ ] **Step 5: Inspect and commit Task 2**
 
@@ -461,39 +461,39 @@ Run:
 
 ```bash
 git diff --check
-git add templates/implementation-brief.md tests/validate.sh
+git add protocol/implementation-brief.md tests/validate.sh
 git diff --cached --check
-git commit -m "feat: add portable implementation brief"
+git commit -m "feat: add implementation protocol"
 ```
 
-Expected: one commit containing the canonical prompt and its semantic checks.
+Expected: one commit containing the canonical implementation protocol and its semantic checks.
 
 ## Task 3: Neutral Worked Example
 
 **Files:**
 
-- Create: `examples/complete-project-example.md`
+- Create: `examples/secure-endpoint-change.md`
 - Modify: `tests/validate.sh`
 
 **Interfaces:**
 
-- Consumes: every input field from `templates/implementation-brief.md`.
+- Consumes: every input field from `protocol/implementation-brief.md`.
 - Produces: a copyable neutral example with no unresolved double-braced fields.
 
 - [ ] **Step 1: Confirm the documentation scope fails before implementation**
 
 Run: `sh tests/validate.sh docs`
 
-Expected: exit 1; the first missing documentation file may be `README.md`, `LICENSE`, or `examples/complete-project-example.md` depending on validator order.
+Expected: exit 1; the first missing documentation file may be `README.md`, `LICENSE`, or `examples/secure-endpoint-change.md` depending on validator order.
 
 - [ ] **Step 2: Add a fully resolved example**
 
-Create `examples/complete-project-example.md` using a fictional repository `/workspace/sample-service`. The example must request a rate-limited health endpoint, require tests and documentation, prohibit remote mutation, and use this complete input block:
+Create `examples/secure-endpoint-change.md` using a fictional repository `/workspace/sample-service`. The example must request a rate-limited health endpoint, require tests and documentation, prohibit remote mutation, and use this complete input block:
 
 ````markdown
-# Example: Complete a Bounded Repository Change
+# Example: Secure Endpoint Change
 
-This example shows how to specialize the portable template. The repository and task are fictional.
+This fictional scenario demonstrates `brief` mode for a bounded security change. The repository and task are fictional.
 
 ```text
 mode: brief
@@ -534,7 +534,7 @@ EXTERNAL_INPUTS:
 No credentials are required. Use test doubles for dependency checks. Report any real integration environment as unavailable rather than inventing results.
 ```
 
-Expected brief-mode result: one self-contained assignment based on `templates/implementation-brief.md`, with every field above resolved and no dependency on prior conversation.
+Expected result: an implementation brief that conforms to `protocol/implementation-brief.md`, resolves every supplied field, and requires no unstated context.
 ````
 
 Use four backticks for the outer code fence when authoring this file so the nested `text` fence renders correctly.
@@ -544,9 +544,9 @@ Use four backticks for the outer code fence when authoring this file so the nest
 Append these checks to `validate_docs()` after the unresolved-field check:
 
 ```sh
-  require_literal "examples/complete-project-example.md" "The repository and task are fictional."
-  require_literal "examples/complete-project-example.md" "/workspace/sample-service"
-  require_literal "examples/complete-project-example.md" "Do not push, create a pull request, deploy, or publish"
+  require_literal "examples/secure-endpoint-change.md" "The repository and task are fictional."
+  require_literal "examples/secure-endpoint-change.md" "/workspace/sample-service"
+  require_literal "examples/secure-endpoint-change.md" "Do not push, create a pull request, deploy, or publish"
 ```
 
 - [ ] **Step 4: Run a temporary focused example check**
@@ -554,9 +554,9 @@ Append these checks to `validate_docs()` after the unresolved-field check:
 Because `README.md` and `LICENSE` intentionally arrive in Task 4, run:
 
 ```bash
-test -f examples/complete-project-example.md
-! grep -Eq '\{\{[A-Z_]+\}\}' examples/complete-project-example.md
-grep -Fq '/workspace/sample-service' examples/complete-project-example.md
+test -f examples/secure-endpoint-change.md
+! grep -Eq '\{\{[A-Z_]+\}\}' examples/secure-endpoint-change.md
+grep -Fq '/workspace/sample-service' examples/secure-endpoint-change.md
 ```
 
 Expected: exit 0 with no output.
@@ -567,7 +567,7 @@ Run:
 
 ```bash
 git diff --check
-git add examples/complete-project-example.md tests/validate.sh
+git add examples/secure-endpoint-change.md tests/validate.sh
 git diff --cached --check
 git commit -m "docs: add neutral implementation example"
 ```
@@ -584,8 +584,8 @@ Expected: one commit containing only the neutral example and its assertions.
 
 **Interfaces:**
 
-- Consumes: invocation and input contracts from `SKILL.md` and `templates/implementation-brief.md`.
-- Produces: installation and operation guidance for both skill and no-install workflows.
+- Consumes: invocation and input contracts from `SKILL.md` and `protocol/implementation-brief.md`.
+- Produces: installation and operation guidance for both framework modes.
 
 - [ ] **Step 1: Add README-specific validation before the file exists**
 
@@ -593,7 +593,7 @@ In `validate_docs()`, add these assertions immediately after `require_file "READ
 
 ```sh
   require_literal "README.md" "git clone https://github.com/akarazhev/auto-impl-brief.git"
-  require_literal "README.md" "templates/implementation-brief.md"
+  require_literal "README.md" "protocol/implementation-brief.md"
   require_literal "README.md" "Apache-2.0"
 ```
 
@@ -606,7 +606,7 @@ Expected: exit 1 because `README.md` or `LICENSE` is missing.
 Create `README.md` with these sections in order:
 
 1. title and one-paragraph purpose;
-2. “Choose a workflow” comparing `mode: brief`, `mode: execute`, and direct use of `templates/implementation-brief.md`;
+2. “Modes” defining `mode: brief`, `mode: execute`, and the shared implementation protocol;
 3. “Install as a personal Codex skill” with the commands below;
 4. “Use” with complete brief- and execute-mode invocations;
 5. “Inputs” defining all nine public fields and stating that only `OBJECTIVE` is universally required;
@@ -648,7 +648,7 @@ Expected: `PASS: docs`.
 Run:
 
 ```bash
-if rg -n '/Users/|C:\\Users\\|Developer/' README.md SKILL.md templates examples docs/design.md; then
+if rg -n '/Users/|C:\\Users\\|Developer/' README.md SKILL.md protocol examples docs/design.md; then
   exit 1
 fi
 ```
@@ -674,7 +674,7 @@ Expected: one commit containing README, license, and documentation assertions.
 
 - Modify: `tests/validate.sh`
 - Modify: `README.md` only if verification exposes an incorrect command.
-- Modify: `SKILL.md` or `templates/implementation-brief.md` only if cross-file verification exposes a specification inconsistency.
+- Modify: `SKILL.md` or `protocol/implementation-brief.md` only if cross-file verification exposes a specification inconsistency.
 
 **Interfaces:**
 
@@ -689,10 +689,10 @@ Add this function before the `scope` assignment in `tests/validate.sh`:
 validate_consistency() {
   for field in OBJECTIVE REPOSITORY STARTING_POINT SPECIFICATIONS CONSTRAINTS ACCEPTANCE_CRITERIA MODEL_POLICY GIT_AND_PUBLISH_POLICY EXTERNAL_INPUTS; do
     require_literal "SKILL.md" "$field"
-    require_literal "templates/implementation-brief.md" "{{$field}}"
+    require_literal "protocol/implementation-brief.md" "{{$field}}"
   done
   require_literal "SKILL.md" "Do not push"
-  require_literal "templates/implementation-brief.md" "do not push"
+  require_literal "protocol/implementation-brief.md" "do not push"
   require_literal "README.md" "no unauthorized remote"
 }
 ```
@@ -712,7 +712,7 @@ Run:
 ```bash
 sh -n tests/validate.sh
 sh tests/validate.sh skill
-sh tests/validate.sh template
+sh tests/validate.sh protocol
 sh tests/validate.sh docs
 sh tests/validate.sh consistency
 sh tests/validate.sh all
@@ -728,12 +728,12 @@ From a clean shell at the repository root, verify all of the following without r
 ```bash
 test -f SKILL.md
 test -f agents/openai.yaml
-test -f templates/implementation-brief.md
+test -f protocol/implementation-brief.md
 ```
 
 Then manually confirm:
 
-- brief mode directs the agent to return a standalone assignment and not execute it;
+- brief mode directs the agent to return a complete implementation brief and not execute it;
 - execute mode directs the agent to inspect, build a graph, test first, implement, and verify;
 - missing permissions cannot be inferred;
 - a dirty worktree is preserved;
@@ -760,7 +760,7 @@ If Task 5 changed tracked files, run:
 
 ```bash
 git diff --check
-git add tests/validate.sh README.md SKILL.md templates/implementation-brief.md
+git add tests/validate.sh README.md SKILL.md protocol/implementation-brief.md
 git diff --cached --check
 git commit -m "test: verify skill package consistency"
 ```
@@ -783,7 +783,7 @@ Expected: `main` is synchronized with `origin/main`, the worktree is clean, and 
 ## Acceptance Mapping
 
 - Installable personal skill: Tasks 1 and 5.
-- Portable Markdown template: Task 2.
+- Implementation protocol: Task 2.
 - Explicit and inferred `brief`/`execute` modes: Task 1.
 - Project-neutral specialization example: Task 3.
 - Safe Git, external-action, evidence, graph, delegation, and model-economy rules: Tasks 1 and 2.

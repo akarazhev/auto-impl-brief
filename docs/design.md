@@ -2,28 +2,34 @@
 
 **Date:** 2026-09-14
 
-**Status:** Approved for implementation
+**Status:** Implemented
 
 **Repository:** `akarazhev/auto-impl-brief`
 
 ## Purpose
 
-`auto-impl-brief` provides a reusable, project-independent contract for giving Codex complex implementation work. It supports two related workflows:
+`auto-impl-brief` is a controlled implementation orchestration framework for Codex. It prepares complete implementation briefs and runs structured repository changes under explicit verification and authority controls.
 
-1. producing a self-contained implementation brief that can be handed to a clean Codex session; and
-2. executing that brief autonomously in the current repository.
+The framework remains independent of any target project, organization, programming language, and repository layout. Target repositories provide objectives and context; they do not define the framework itself.
 
-The project must remain independent of any target project, organization, programming language, and repository layout.
+## Product Model
+
+The framework has two operating modes backed by one implementation protocol:
+
+1. `brief` compiles supplied facts and safe defaults into a complete implementation brief for a Codex session.
+2. `execute` performs an implementation run in the current repository and reports verified results.
+
+The shared protocol governs inspection, dependency-aware planning, engineering loops, bounded delegation, verification gates, blocker handling, and authority boundaries.
 
 ## Deliverables
 
-The repository will contain:
+The repository contains:
 
-- a personal Codex skill named `auto-impl-brief`;
-- a portable Markdown template for users who do not have the skill installed;
-- examples showing how to specialize the template without coupling the core to those examples;
-- validation tests for the skill package and template;
-- installation and usage documentation;
+- the installable Codex skill `auto-impl-brief`;
+- the canonical implementation protocol;
+- a complete fictional invocation that demonstrates `brief` mode;
+- dependency-free structural, contract, branding, and consistency validation;
+- installation, operation, and development documentation;
 - the Apache License 2.0.
 
 ## Repository Structure
@@ -35,17 +41,20 @@ auto-impl-brief/
 ├── SKILL.md
 ├── agents/
 │   └── openai.yaml
-├── templates/
+├── protocol/
 │   └── implementation-brief.md
 ├── examples/
-│   └── complete-project-example.md
+│   └── secure-endpoint-change.md
 ├── tests/
 │   └── validate.sh
 └── docs/
-    └── design.md
+    ├── design.md
+    └── superpowers/
+        ├── plans/
+        └── specs/
 ```
 
-The repository root is also the installable skill directory. A user can clone it directly under the personal Codex skills directory or install it from GitHub.
+The repository root is the installable skill directory. GitHub is the canonical distribution source, and an existing clone may also be linked into the personal Codex skills directory.
 
 ## Modes
 
@@ -56,12 +65,12 @@ Invocation example:
 ```text
 $auto-impl-brief mode: brief
 
-Objective: ...
-Repository: ...
-Constraints: ...
+OBJECTIVE: ...
+REPOSITORY: ...
+CONSTRAINTS: ...
 ```
 
-The skill inspects the supplied context and produces a complete, copyable assignment for a clean Codex agent. It must resolve reasonable defaults, identify missing material inputs, and preserve unknowns as explicit placeholders rather than inventing project facts.
+The skill reads `protocol/implementation-brief.md`, resolves every public field from supplied facts, inspected repository context, or explicit safe defaults, and returns a complete implementation brief. Unknown material inputs remain explicit instead of being invented. The brief is not executed unless the user separately requests execution.
 
 ### Execute mode
 
@@ -70,124 +79,111 @@ Invocation example:
 ```text
 $auto-impl-brief mode: execute
 
-Objective: ...
-Acceptance criteria: ...
+OBJECTIVE: ...
+ACCEPTANCE_CRITERIA: ...
 ```
 
-The skill applies the same contract directly. It inspects repository instructions, constructs a dependency graph, executes ready work nodes, verifies integrations, and continues until completion or a precisely documented blocker.
+The skill applies the implementation protocol directly. It inspects repository instructions and Git state, constructs a dependency graph for multi-step work, executes ready nodes, verifies integrations, and continues until completion or a precisely documented blocker.
 
 ### Mode inference
 
 When no mode is supplied:
 
-- requests such as “prepare”, “write”, or “generate an assignment” select `brief`;
-- requests such as “implement”, “fix”, or “complete” select `execute`;
+- requests to prepare, write, or generate an implementation brief select `brief`;
+- requests to implement, fix, build, or complete work select `execute`;
 - genuinely ambiguous requests require one concise clarification.
 
-Explicit `mode` always wins.
+An explicit `mode` always wins.
 
 ## Inputs
 
-The reusable contract accepts:
+The public protocol fields are:
 
 - `OBJECTIVE` — required outcome;
 - `REPOSITORY` — target path or repository reference;
-- `STARTING_POINT` — optional branch, tag, or commit;
+- `STARTING_POINT` — branch, tag, or commit when relevant;
 - `SPECIFICATIONS` — source documents and requirements;
 - `CONSTRAINTS` — technical, security, cost, and operational limits;
 - `ACCEPTANCE_CRITERIA` — observable completion conditions;
 - `MODEL_POLICY` — optional orchestration and escalation policy;
-- `GIT_AND_PUBLISH_POLICY` — commit, PR, push, and deployment authority;
+- `GIT_AND_PUBLISH_POLICY` — commit, pull-request, push, and deployment authority;
 - `EXTERNAL_INPUTS` — credentials, target systems, profiles, or datasets supplied separately.
 
-Only the objective is universally required. The skill derives repository context when it is already running inside the target repository.
+Only `OBJECTIVE` is universally required. Repository facts are derived when Codex is already operating in the target repository. Missing paths, credentials, permissions, test results, and external state are never invented.
 
-## Execution Contract
+## Implementation Protocol
 
-Execute mode uses an evidence-producing engineering loop:
+Every implementation node uses:
 
 ```text
 Inspect → Define → Test first → Implement → Verify locally →
 Review diff → Verify broadly → Record evidence → Integrate
 ```
 
-For multi-step work, the skill maintains a dependency graph. Each node records its dependencies, status, owner, affected files, verification evidence, commit when applicable, and residual risks. A node becomes ready only after its dependencies are verified.
+For multi-step work, each dependency-graph node records its dependencies, readiness, owner, affected files, acceptance checks, status, verification evidence, commit when applicable, blockers, and residual risks. A node becomes ready only after every dependency is verified.
 
-Independent ready nodes may be delegated to fresh subagents. Concurrent agents must have bounded scopes and non-overlapping file ownership wherever practical. The orchestrator remains responsible for combined-diff review and re-running integrated verification.
+Independent ready nodes may be delegated when useful. Delegated scopes must be bounded and must avoid overlapping file ownership or shared integration contracts. The root agent remains accountable for architectural consistency, combined-diff review, integrated verification, and completion claims.
 
-## Default Safety Policy
+## Verification Gates
 
-Unless the user explicitly overrides a default, the skill must:
+Focused checks run for each implementation node. The union of affected checks runs after integration, and broad repository verification runs at phase and completion gates. A final report maps fresh evidence to every acceptance criterion and identifies any unavailable environment-dependent checks.
 
-- read applicable `AGENTS.md`, `CLAUDE.md`, and repository instructions first;
-- inspect Git status before editing;
-- preserve unrelated and untracked user work;
-- avoid destructive Git operations;
-- avoid push, PR creation, deployment, publication, and other remote mutation;
-- use test-driven development for features and defect fixes;
-- verify claims with fresh command output before declaring completion;
-- limit implementation concurrency to three subagents;
-- avoid exposing secrets or copying external private inputs into the repository;
-- report unavailable environmental verification rather than fabricating success;
-- distinguish genuine external blockers from ordinary engineering failures.
+A failing test returns the run to inspection and diagnosis. Assertions, required checks, and required behaviour cannot be weakened merely to obtain a pass.
+
+## Authority Boundaries
+
+Unless the user explicitly authorizes an action, the framework must:
+
+- read applicable repository instructions and inspect Git status before editing;
+- preserve unrelated tracked and untracked work;
+- avoid destructive Git and filesystem operations;
+- avoid pushes, pull requests, deployments, publications, messages, and other remote mutations;
+- prevent credentials and private external inputs from entering tracked files;
+- report unavailable environmental verification accurately;
+- distinguish external blockers from ordinary engineering failures.
+
+Execution pauses only when further progress requires new authority, credentials, unavailable mandatory external state, a destructive out-of-scope action, or a material product decision not resolved by supplied requirements. Independent ready work continues when one graph branch is blocked.
 
 ## Model Economy
 
-The template describes roles rather than depending on a single model name:
+Model policy is role-based and optional:
 
-- a strong reasoning model orchestrates architecture, trust-boundary work, integration, and final review;
-- a cost-efficient coding model handles isolated routine implementation and test tasks;
-- reasoning effort is escalated only for security-critical work, stubborn failures, or adversarial final review;
-- deterministic validation is preferred to redundant model review.
+- strong reasoning is appropriate for architecture, security boundaries, integration, difficult diagnosis, and final adversarial review;
+- cost-efficient coding is appropriate for isolated routine implementation and tests;
+- reasoning effort escalates only when evidence justifies it;
+- deterministic tools and tests take precedence over redundant model review.
 
-Concrete model names may be supplied by the user or filled from the models available in the active Codex environment. Missing model-selection controls must not prevent execution.
-
-## Error and Blocker Handling
-
-Failed tests and implementation difficulties return the work to inspection and diagnosis. The skill must not weaken assertions, suppress required checks, or misclassify required functionality as optional.
-
-Execution pauses only when progress requires new authority, credentials, unavailable mandatory external state, a destructive out-of-scope action, or a material product decision not resolved by the input. Independent ready work continues when one graph branch is blocked.
+Concrete model names may be supplied by the user or selected from the active Codex environment. Missing model-selection controls do not prevent execution.
 
 ## Outputs
 
-Brief mode returns a single self-contained prompt containing the objective, context, constraints, execution contract, acceptance criteria, safety rules, and required final report.
+Brief mode returns one complete implementation brief containing the objective, context, constraints, protocol, acceptance criteria, authority boundaries, and required final report.
 
 Execute mode returns an evidence-backed completion report containing:
 
-- completed work and commits;
+- completed work units and commits;
 - changed behaviour and architecture;
-- verification commands with exact results;
+- exact verification commands and results;
 - acceptance-criteria mapping;
 - unavailable checks and residual risks;
-- final Git status;
-- disclosure of any authorized remote action.
+- authorized external actions;
+- final Git status.
 
 ## Validation
 
-Automated validation will check:
+`tests/validate.sh` exposes these scopes:
 
-- required skill metadata and agent configuration;
-- the presence and integrity of both modes;
-- required Markdown-template placeholders;
-- absence of project-specific names, paths, and assumptions in reusable files;
-- inclusion of safety, verification, graph, delegation, and completion rules;
-- consistency between the skill, template, README, and examples.
+- `skill` checks the skill entry point and Codex metadata;
+- `protocol` checks public fields and execution guarantees;
+- `docs` checks installation, license, and the fictional example;
+- `branding` rejects retired positioning and obsolete paths;
+- `consistency` checks cross-file invariants;
+- `all` runs every scope.
 
-Manual scenarios will verify:
-
-1. generating a brief for a new repository;
-2. executing a small bounded change;
-3. preserving a dirty worktree;
-4. handling a missing external input;
-5. refusing unauthorized push or deployment;
-6. escalating a security-critical task while keeping routine work economical.
+Manual scenarios cover preparing an implementation brief, performing a bounded implementation run, preserving a dirty worktree, handling a missing external input, refusing an unauthorized remote action, and applying role-based model economy to security-critical and routine work.
 
 ## Distribution
 
-The canonical project will be the public GitHub repository:
+The canonical public repository is `https://github.com/akarazhev/auto-impl-brief`.
 
-`https://github.com/akarazhev/auto-impl-brief`
-
-The project will be distributed under the Apache License 2.0.
-
-The repository will contain no credentials, private target data, or generated evidence from private projects. Publishing the initial repository is authorized; later releases and changes remain subject to explicit user instructions.
+The project is distributed under Apache-2.0. The repository contains no credentials, private target data, or generated evidence from private projects. Publication remains subject to explicit user authorization.

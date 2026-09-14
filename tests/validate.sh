@@ -39,12 +39,13 @@ reject_pattern_ci() {
 }
 
 validate_branding() {
-  for file in README.md SKILL.md agents/openai.yaml protocol/implementation-brief.md examples/secure-endpoint-change.md; do
+  for file in README.md SKILL.md agents/openai.yaml protocol/implementation-brief.md examples/secure-endpoint-change.md docs/design.md docs/superpowers/plans/2026-09-14-auto-impl-brief.md; do
     require_file "$file"
-    reject_pattern_ci "$file" 'portable|reusable|clean[[:space:]]+codex|handoff|evidence-driven[[:space:]]+software[[:space:]]+implementation'
+    reject_pattern_ci "$file" 'portable|reusable|clean[[:space:]]+codex|handoff|evidence-driven[[:space:]]+software[[:space:]]+implementation|templates/implementation-brief|examples/complete-project-example|validate_template'
   done
 
   require_literal "README.md" '`auto-impl-brief` is a controlled implementation orchestration framework for Codex.'
+  require_literal "docs/design.md" '`auto-impl-brief` is a controlled implementation orchestration framework for Codex.'
   require_literal "agents/openai.yaml" 'short_description: "Plan and run controlled software implementations"'
   require_literal "protocol/implementation-brief.md" "# Auto Implementation Protocol"
   test ! -e "$repo_root/templates" || fail "obsolete templates directory exists"
