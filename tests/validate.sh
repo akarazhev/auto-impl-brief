@@ -60,6 +60,10 @@ validate_template() {
   require_literal "templates/implementation-brief.md" "Inspect → Define → Test first → Implement"
   require_literal "templates/implementation-brief.md" "## Dependency graph"
   require_literal "templates/implementation-brief.md" "## Final report"
+  require_literal "templates/implementation-brief.md" "Do not stop after planning, scaffolding, or partial implementation."
+  require_literal "templates/implementation-brief.md" "at most three implementation subagents concurrently"
+  require_literal "templates/implementation-brief.md" "Without explicit authorization, do not push"
+  require_literal "templates/implementation-brief.md" "map evidence to every acceptance criterion"
   reject_literal "templates/implementation-brief.md" "/Users/"
   reject_literal "templates/implementation-brief.md" "C:\\Users\\"
 }
